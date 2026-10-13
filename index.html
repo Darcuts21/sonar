@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sonar — tout savoir sur un site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--sea:#1426d6;--deep:#0a1170;--ink:#f4f1ff;--ping:#ffd23f;--mute:#a9b2ff;--paper:#f4f1ff;--paper-ink:#0d1245;--ok:#1fa35b;--ko:#d6344a}
+*{box-sizing:border-box;margin:0}
+html{background:var(--sea)}
+body{font:400 16px/1.55 'Instrument Sans',system-ui,sans-serif;color:var(--ink);min-height:100vh;background:radial-gradient(120% 80% at 50% 0%,#2a3cff 0%,var(--sea) 45%,var(--deep) 100%) fixed}
+h1,h2,h3,.disp{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+/* hero */
+.hero{min-height:92vh;display:grid;place-items:center;position:relative;overflow:hidden;padding:60px 0}
+.rings{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.rings i{position:absolute;border:1.5px solid rgba(244,241,255,.22);border-radius:50%;width:var(--s);height:var(--s)}
+.rings i:nth-child(1){--s:260px}.rings i:nth-child(2){--s:480px}.rings i:nth-child(3){--s:720px}.rings i:nth-child(4){--s:1000px}.rings i:nth-child(5){--s:1360px}
+.sweep{position:absolute;width:1360px;height:1360px;border-radius:50%;background:conic-gradient(from 0deg,rgba(255,210,63,0) 0deg,rgba(255,210,63,.0) 300deg,rgba(255,210,63,.28) 358deg,rgba(255,210,63,.9) 360deg);opacity:0;animation:spin 2.4s linear infinite;-webkit-mask:radial-gradient(circle,#000 0 70%,transparent 71%);mask:radial-gradient(circle,#000 0 70%,transparent 71%)}
+body.scan .sweep{opacity:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pings i.p{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--ping);box-shadow:0 0 0 0 rgba(255,210,63,.7);animation:pulse 1.6s ease-out infinite}
+@keyframes pulse{to{box-shadow:0 0 0 22px rgba(255,210,63,0)}}
+.core{position:relative;text-align:center;width:min(760px,100%)}
+h1{font-size:clamp(3rem,10vw,7.5rem);line-height:.88;font-weight:800;letter-spacing:-.045em;font-variation-settings:'wdth' 75}
+.sub{margin:22px auto 34px;max-width:46ch;color:var(--mute);font-size:1.08rem}
+form{display:flex;background:var(--paper);padding:6px;border-radius:999px;box-shadow:0 18px 60px rgba(4,8,70,.55)}
+input{flex:1;min-width:0;border:0;background:none;padding:14px 22px;font:600 1.05rem 'Instrument Sans',sans-serif;color:var(--paper-ink);outline:none}
+input::placeholder{color:#8a90c8;font-weight:400}
+button{border:0;cursor:pointer;background:var(--ping);color:#2a2200;font:700 1rem 'Bricolage Grotesque',sans-serif;padding:0 28px;border-radius:999px}
+button:hover{filter:brightness(1.07)}
+:focus-visible{outline:3px solid var(--ping);outline-offset:3px}
+form:focus-within{outline:3px solid var(--ping);outline-offset:3px}
+.err{margin-top:14px;color:var(--ping);min-height:1.5em}
+/* results */
+#out{display:none;padding:10px 0 90px}
+#out.on{display:block}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:26px;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.head h2{font-size:clamp(1.8rem,5vw,3.2rem);letter-spacing:-.03em;word-break:break-all}
+.head span{color:var(--mute)}
+.grid{columns:2 440px;column-gap:18px}
+.plate{break-inside:avoid;margin:0 0 18px;background:var(--paper);color:var(--paper-ink);border-left:10px solid #9aa2e8;padding:16px 18px 18px;animation:in .5s ease both}
+.plate.ok{border-color:var(--ok)}.plate.ko{border-color:var(--ko)}.plate.load{border-color:var(--ping)}
+@keyframes in{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.plate h3{font-size:1.25rem;letter-spacing:-.02em;margin-bottom:8px}
+.plate p,.plate li{font-size:.95rem}
+.plate ul{padding-left:18px}
+.plate a{color:#1426d6;word-break:break-all}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:.93rem}
+.kv b{font-weight:600;color:#4a52a8}
+.kv span{word-break:break-word}
+.dim{color:#5b62a6;font-size:.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips a{font-size:.85rem;text-decoration:none;border:1.5px solid var(--paper-ink);padding:3px 10px;border-radius:999px;color:var(--paper-ink)}
+.chips a:hover{background:var(--paper-ink);color:var(--paper)}
+.sec{margin:34px 0 14px;font-size:1.5rem;letter-spacing:-.02em}
+footer{padding:30px 0 50px;color:var(--mute);font-size:.88rem;max-width:70ch}
+@media (prefers-reduced-motion:reduce){.sweep,.pings i.p,.plate{animation:none}}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="rings"><i></i><i></i><i></i><i></i><i></i><div class="sweep"></div><div class="pings" id="pings"></div></div>
+  <div class="core wrap">
+    <h1>Sonar</h1>
+    <p class="sub">Colle un lien. On interroge DNS, WHOIS, certificats, archives, forums et moteurs, puis on te rend le dossier.</p>
+    <form id="f" autocomplete="off">
+      <input id="u" type="text" inputmode="url" placeholder="exemple.com ou https://…" aria-label="URL à analyser" autofocus>
+      <button type="submit">Scanner</button>
+    </form>
+    <div class="err" id="err" role="alert"></div>
+  </div>
+</section>
+
+<main class="wrap" id="out">
+  <div class="head"><h2 id="dom"></h2><span id="meta"></span></div>
+  <div class="grid" id="grid"></div>
+  <h2 class="sec">Creuser plus loin</h2>
+  <div class="grid"><div class="plate" id="pivots"><div class="chips" id="chips"></div></div></div>
+  <footer>Sonar interroge des API publiques depuis ton navigateur. Une source qui bloque ou limite les requêtes apparaît en rouge ; les liens « Creuser plus loin » couvrent ce qu'aucune API ouverte ne donne.</footer>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const kv=o=>'<div class="kv">'+Object.entries(o).filter(([,v])=>v!==''&&v!=null).map(([k,v])=>`<b>${esc(k)}</b><span>${v}</span>`).join('')+'</div>';
+const ago=ms=>{const d=(Date.now()-ms)/864e5;return d<60?Math.round(d)+' j':d<730?Math.round(d/30)+' mois':(d/365).toFixed(1)+' ans'};
+async function J(url,opt){const c=new AbortController();const t=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{...opt,signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(t)}}
+
+// ping dots
+(function(){const p=$('#pings');for(let i=0;i<7;i++){const e=document.createElement('i');e.className='p';const a=Math.random()*6.28,r=120+Math.random()*300;e.style.left=Math.cos(a)*r+'px';e.style.top=Math.sin(a)*r+'px';e.style.animationDelay=(Math.random()*1.6)+'s';p.appendChild(e)}})();
+
+function plate(title){
+  const el=document.createElement('section');el.className='plate load';
+  el.innerHTML=`<h3>${esc(title)}</h3><div class="b dim">Interrogation…</div>`;
+  $('#grid').appendChild(el);
+  return {ok:h=>{el.className='plate ok';el.querySelector('.b').className='b';el.querySelector('.b').innerHTML=h},
+          ko:m=>{el.className='plate ko';el.querySelector('.b').className='b dim';el.querySelector('.b').textContent=m},
+          none:m=>{el.className='plate';el.querySelector('.b').className='b dim';el.querySelector('.b').textContent=m}};
+}
+
+const mods=[
+ ['La page elle-même',async(P,d,u)=>{
+   const r=await J('https://api.allorigins.win/get?url='+encodeURIComponent(u));
+   const doc=new DOMParser().parseFromString(r.contents||'','text/html');
+   const m=n=>doc.querySelector(`meta[name="${n}"],meta[property="${n}"]`)?.content||'';
+   const o={Titre:esc(doc.title),Description:esc(m('description')||m('og:description')),Générateur:esc(m('generator')),Langue:esc(doc.documentElement.lang),'Nom du site':esc(m('og:site_name')),'Image':m('og:image')?`<a href="${esc(m('og:image'))}" target="_blank" rel="noopener">og:image</a>`:'','Liens sortants':[...new Set([...doc.querySelectorAll('a[href^="http"]')].map(a=>{try{return new URL(a.href).hostname}catch{return ''}}))].filter(h=>h&&!h.endsWith(d)).slice(0,8).map(esc).join(', ')};
+   if(!doc.title&&!m('description'))return P.none('Page illisible ou protégée.');P.ok(kv(o))}],
+ ['DNS',async(P,d)=>{
+   const t=['A','AAAA','MX','NS','TXT'];const res=await Promise.all(t.map(x=>J(`https://dns.google/resolve?name=${d}&type=${x}`).catch(()=>null)));
+   const o={};res.forEach((r,i)=>{const a=(r?.Answer||[]).map(x=>esc(x.data)).slice(0,5);if(a.length)o[t[i]]=a.join('<br>')});
+   window.__ip=(res[0]?.Answer||[]).find(x=>x.type===1)?.data;
+   Object.keys(o).length?P.ok(kv(o)):P.none('Aucun enregistrement.')}],
+ ['Propriétaire du domaine (RDAP)',async(P,d)=>{
+   const r=await J('https://rdap.org/domain/'+d);const ev=a=>(r.events||[]).find(e=>e.eventAction===a)?.eventDate;
+   const reg=(r.entities||[]).find(e=>(e.roles||[]).includes('registrar'));
+   const nm=reg?.vcardArray?.[1]?.find(x=>x[0]==='fn')?.[3];
+   const c=ev('registration');
+   P.ok(kv({Registrar:esc(nm),Création:c?esc(c.slice(0,10))+` <span class="dim">(${ago(Date.parse(c))})</span>`:'',Expiration:esc((ev('expiration')||'').slice(0,10)),'Dernière modif.':esc((ev('last changed')||'').slice(0,10)),Statut:esc((r.status||[]).join(', '))}))}],
+ ['Serveur & localisation',async(P,d)=>{
+   await new Promise(r=>setTimeout(r,900));const ip=window.__ip;if(!ip)return P.none('IP introuvable.');
+   const r=await J('https://ipwho.is/'+ip);if(!r.success)throw new Error(r.message);
+   P.ok(kv({IP:esc(ip),Pays:esc(r.flag?.emoji+' '+r.country),Ville:esc(r.city),Hébergeur:esc(r.connection?.isp),Organisation:esc(r.connection?.org),ASN:esc(r.connection?.asn)}))}],
+ ['Sous-domaines (certificats)',async(P,d)=>{
+   const r=await J(`https://crt.sh/?q=%25.${d}&output=json`);
+   const s=[...new Set(r.flatMap(x=>x.name_value.split('\n')).map(x=>x.replace(/^\*\./,'').toLowerCase()))].filter(x=>x.endsWith(d)).sort();
+   s.length?P.ok(`<p class="dim">${s.length} trouvés</p><ul>${s.slice(0,25).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${s.length>25?`<p class="dim">+ ${s.length-25} autres</p>`:''}`):P.none('Aucun certificat public.')}],
+ ['Archives (Wayback Machine)',async(P,d)=>{
+   const [f,l]=await Promise.all([J(`https://web.archive.org/cdx/search/cdx?url=${d}&output=json&limit=1&fl=timestamp`),J(`https://web.archive.org/cdx/search/cdx?url=${d}&output=json&limit=-1&fl=timestamp`)]);
+   if(f.length<2)return P.none('Jamais archivé.');
+   const t=x=>{x=x[1][0];return `${x.slice(0,4)}-${x.slice(4,6)}-${x.slice(6,8)}`};
+   P.ok(kv({'Première capture':`<a href="https://web.archive.org/web/${f[1][0]}/https://${d}" target="_blank" rel="noopener">${t(f)}</a>`,'Dernière capture':`<a href="https://web.archive.org/web/${l[1][0]}/https://${d}" target="_blank" rel="noopener">${t(l)}</a>`}))}],
+ ['Scans publics (urlscan.io)',async(P,d)=>{
+   const r=await J(`https://urlscan.io/api/v1/search/?q=domain:${d}&size=6`);
+   if(!r.results?.length)return P.none('Aucun scan public.');
+   P.ok(`<p class="dim">${r.total} scans</p><ul>${r.results.map(x=>`<li><a href="${esc(x.result.replace('/api/v1/result','/result'))}" target="_blank" rel="noopener">${esc(x.page.url)}</a> <span class="dim">${esc(x.page.server||'')} ${esc(x.page.country||'')}</span></li>`).join('')}</ul>`)}],
+ ['Wikipédia',async(P,d)=>{
+   const n=d.split('.').slice(-2,-1)[0]||d;
+   const r=await J(`https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(d+' OR '+n)}&srlimit=4&format=json&origin=*`);
+   const s=r.query.search;s.length?P.ok('<ul>'+s.map(x=>`<li><a href="https://fr.wikipedia.org/wiki/${encodeURIComponent(x.title)}" target="_blank" rel="noopener">${esc(x.title)}</a></li>`).join('')+'</ul>'):P.none('Aucun article.')}],
+ ['Discussions (Hacker News)',async(P,d)=>{
+   const r=await J(`https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(d)}&tags=story&hitsPerPage=6`);
+   r.hits.length?P.ok(`<p class="dim">${r.nbHits} mentions</p><ul>`+r.hits.map(x=>`<li><a href="https://news.ycombinator.com/item?id=${x.objectID}" target="_blank" rel="noopener">${esc(x.title)}</a> <span class="dim">${x.points} pts</span></li>`).join('')+'</ul>'):P.none('Aucune mention.')}],
+ ['Code (GitHub)',async(P,d)=>{
+   const r=await J(`https://api.github.com/search/repositories?q=${encodeURIComponent('"'+d+'" in:readme,description')}&per_page=6`);
+   r.items.length?P.ok(`<p class="dim">${r.total_count} dépôts le citent</p><ul>`+r.items.map(x=>`<li><a href="${esc(x.html_url)}" target="_blank" rel="noopener">${esc(x.full_name)}</a> <span class="dim">★ ${x.stargazers_count}</span></li>`).join('')+'</ul>'):P.none('Aucun dépôt.')}]
+];
+
+const pivots=[['Google','https://www.google.com/search?q=%22{d}%22'],['Google (hors site)','https://www.google.com/search?q=%22{d}%22+-site%3A{d}'],['Bing','https://www.bing.com/search?q=%22{d}%22'],['DuckDuckGo','https://duckduckgo.com/?q=%22{d}%22'],['Reddit','https://www.reddit.com/search/?q={d}'],['X','https://x.com/search?q={d}'],['Trustpilot','https://www.trustpilot.com/review/{d}'],['ScamAdviser','https://www.scamadviser.com/check-website/{d}'],['VirusTotal','https://www.virustotal.com/gui/domain/{d}'],['Safe Browsing','https://transparencyreport.google.com/safe-browsing/search?url={d}'],['Shodan','https://www.shodan.io/search?query={d}'],['Censys','https://search.censys.io/search?q={d}'],['SecurityHeaders','https://securityheaders.com/?q={d}'],['BuiltWith','https://builtwith.com/{d}'],['Similarweb','https://www.similarweb.com/website/{d}/'],['PageSpeed','https://pagespeed.web.dev/analysis?url={u}'],['Wayback','https://web.archive.org/web/*/{d}'],['archive.today','https://archive.ph/{d}'],['ICANN Lookup','https://lookup.icann.org/en/lookup?name={d}'],['DNSdumpster','https://dnsdumpster.com/']];
+
+$('#f').addEventListener('submit',async e=>{
+  e.preventDefault();$('#err').textContent='';
+  let raw=$('#u').value.trim();if(!raw)return;
+  let url;try{url=new URL(/^https?:\/\//i.test(raw)?raw:'https://'+raw);if(!url.hostname.includes('.'))throw 0}catch{$('#err').textContent='URL invalide. Exemple : exemple.com';return}
+  const d=url.hostname.replace(/^www\./,''),u=url.href;window.__ip=null;
+  $('#dom').textContent=d;$('#meta').textContent=u;$('#grid').innerHTML='';
+  $('#chips').innerHTML=pivots.map(([n,t])=>`<a href="${esc(t.replace(/\{d\}/g,encodeURIComponent(d)).replace(/\{u\}/g,encodeURIComponent(u)))}" target="_blank" rel="noopener">${esc(n)}</a>`).join('');
+  $('#out').classList.add('on');document.body.classList.add('scan');
+  setTimeout(()=>$('#out').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}),150);
+  const jobs=mods.map(([title,fn])=>{const P=plate(title);return fn(P,d,u).catch(err=>P.ko('Source indisponible : '+(err.message==='The user aborted a request.'?'délai dépassé':err.message)))});
+  await Promise.allSettled(jobs);document.body.classList.remove('scan');
+});
+</script>
+</body>
+</html>
